@@ -1,19 +1,61 @@
 <head>
-  <title>myCoolPoc</title>
+    <title>Leaderboard</title>
 </head>
-
 <body>
-  <h1>Welcome to Meteor!</h1>
-
-  {{> hello}}
+<main class="container">
+    <h1>Leaderboard <small>brought to you by Meteor</small></h1>
+    <div class="row">
+        {{> leaderboard}}
+    </div>
+</main>
+<br>
+<hr>
+<footer class="container">
+    <p>Made by Roger Zurawicki &lt;3</p>
+    </footer>
 </body>
-
-<template name="hello">
-  <button id="smash">SMASH</button>
-    <button id="right">RIGHT</button>
-    <button id="ace">ACE</button>
-
-  <p>You've pressed the right {{player.actions.right}} times.</p>
-    <p>You've pressed the ace {{player.actions.ace}} times.</p>
-    <p>You've pressed the smatch {{player.actions.smash}} times.</p>
+<template name="leaderboard">
+    <div class="span4">
+        <p>{{sort}}</p>
+        <a id="name" class="btn">Sort by Name</a>
+        <a id="score" class="btn">Sort by Score</a>
+        <a id="shuffle" class="btn btn-warning">Randomize Scores</a>
+        <hr>
+        <!-- The form allows us to insert with the text field and enter -->
+        <form class="form-horizontal">
+            <input type="text" name="name" placeholder="Name">
+            <button id="insert" class="btn btn-success">Insert</button>
+        </form>
+        <hr>
+        <br>
+        {{#if selected_name}}
+        <h4>{{selected_name}}</h4>
+        <a id="increment" class="btn btn-primary">Give 5 points</a>
+        <a id="delete" class="btn btn-danger">Delete</a>
+        {{else}}
+        <p class="lead">Click a player to select</p>
+        {{/if}}
+    </div>
+    <div class="span8">
+        <table id="leaderboard" class="table table-hover">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Score</th>
+            </tr>
+            </thead>
+            {{#each players}}
+            {{> player}}
+            {{/each}}
+        </table>
+    </div>
+    {{#unless selected_name}}
+    <p class="lead">Click a player to select</p>
+    {{/unless}}
+</template>
+<template name="player">
+    <tr class="{{selected}}">
+        <td><span class="lead">{{name}}</span></td>
+        <td><h4>{{score}}</h4></td>
+    </tr>
 </template>
