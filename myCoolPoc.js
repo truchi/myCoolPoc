@@ -1,35 +1,61 @@
+Players = new Mongo.Collection('players');
+
 if (Meteor.isClient) {
-    var actions = {
-        'ACE':0,
-        'SMATCH':0,
-        'RIGHT':0
-    }
-    Actions.insert(actions);
-  Session.setDefault('action', actions);
+//    Meteor.subscribe('player','Nadal');
+    Session.setDefault('player', 'Nadal');
 
   Template.hello.helpers({
-      action: function () {
-          return Session.get('action');
+      player: function () {
+          return Session.get('player');
       }
   });
 
   Template.hello.events({
     'click #right': function () {
-      // increment the counter when button is clicked
-        var actions = Session.get('action');
-        actions.RIGHT++;
-        Session.set('action', actions);
+        var p = Players.findOne(Session.get('player'));
+        console.log(p);
+        p.actions.right++;
+        Players.update(p);
+        Session.set('player', p);
     },
       'click #ace':function(){
-          var actions = Session.get('action');
-          actions.ACE++;
-          Session.set('action', actions);
+          var p = Session.get('player');
+          p.actions.ace++;
+          Players.update(p);
+          Session.set('player', p);
       },
-      'click #smatch':function(){
-          var actions = Session.get('action');
-          actions.SMATCH++;
-          Session.set('action', actions);
+      'click #smash':function(){
+          var p = Session.get('player');
+          p.actions.smash++;
+          Players.update(p);
+          Session.set('player', p);
       }
   });
 }
+if (Meteor.isServer) {
+    Meteor.startup(function () {
+        if(Players.find().count()===0){
+            Players.insert({
+                'name':'Nadal',
+                'actions': {
+                    'ace': 0,
+                    'smash': 0,
+                    'right': 0
+                }
+            });
+            Players.insert({
+                'name':'Federer',
+                'actions': {
+                    'ace': 0,
+                    'smash': 0,
+                    'right': 0
+                }
+            });
+            /*Meteor.publish('player',function(player){
+                return Players.findOne({name:player});
+            });
+            */
+        }
 
+    });
+}
