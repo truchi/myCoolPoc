@@ -17,38 +17,24 @@ if (Meteor.isClient) {
     /* When you press the button, add 5 points to the player */
     Template.leaderboard.events({
         'click #increment': function () {
-            Players.update(Session.get("selected_player"), {$inc: {score: 5}});
+            Players.update(Session.get("selected_player"), {$inc: {score: 1}});
+        },
+        'click #ace': function () {
+            Players.update(Session.get("selected_player"), {$inc: {"actions.ace": 1}});
+        },
+        'click #smash': function () {
+            Players.update(Session.get("selected_player"), {$inc: {"actions.smash": 1}});
+        },
+        'click #volley': function () {
+            Players.update(Session.get("selected_player"), {$inc: {"actions.volley": 1}});
         },
         'click #reset': function () {
-            Players.update(Session.get("selected_player"), {$set :{score: 0}});
+            Players.update(Session.get("selected_player"), {$set :{score: 0, "actions.ace":0, "actions.smash":0, "actions.volley":0}});
         },
         'click #name': function () {
             var sort = Session.get("sort");
             sort = {"name" : sort.name * -1, score: sort.score }
             Session.set("sort", sort);
-        },
-        'click #score': function () {
-            var sort = Session.get("sort");
-            if (_.has(sort,"score"))
-                sort = {score: sort.score * -1, name: sort.name }
-            else
-                sort = {score: -1, name: sort.name}
-            Session.set("sort", sort);
-        },
-        'click #shuffle': function () {
-// get all players
-            var players = Players.find({}).fetch();
-// clear all players
-            for (var i = 0; i < players.length; i++)
-            {
-                Players.remove(players[i]._id);
-            }
-// Re-insert players with new scores
-            for (var i = 0; i < players.length; i++)
-            {
-                var player = {name: players[i].name, score: Math.floor(Random.fraction()*10)*5};
-                Players.insert(player);
-            }
         }
     });
     /* When you click a player, select it */
@@ -63,10 +49,10 @@ if (Meteor.isServer) {
     Meteor.startup(function () {
         if (Players.find().count() === 0) {
             var names = [
-                "Raphael Nadal",
+                "Raphael Nadal"
                 ];
             for (var i = 0; i < names.length; i++)
-                Players.insert({name: names[i], score: 0});
+                Players.insert({name: names[i], score: 0, actions: {ace:0, smash:0, volley:0}});
         }
     });
 }
