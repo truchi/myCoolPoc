@@ -6,19 +6,7 @@ if (Meteor.isClient) {
         return Players.find({}, {sort: Session.get("sort")});
     };
     /* Descirbes in English how the list is sorted */
-    Template.leaderboard.sort = function () {
-        var sort = Session.get("sort");
-        var output = "Sorting by ";
-        _.each(sort, function(v,k,l) {
-            var order = "";
-            if (v === 1)
-                order = "ascending";
-            if (v === -1)
-                order = "descending";
-            output += k+" "+order+", ";
-        });
-        return output;
-    };
+
     Template.leaderboard.selected_name = function () {
         var player = Players.findOne(Session.get("selected_player"));
         return player && player.name;
@@ -31,17 +19,8 @@ if (Meteor.isClient) {
         'click #increment': function () {
             Players.update(Session.get("selected_player"), {$inc: {score: 5}});
         },
-        'click #delete': function () {
-            Players.remove(Session.get("selected_player"));
-        },
-        'click #insert': function () {
-            var n = $("input[name=name]").val();
-            if (n != "") {
-                Players.insert({name: n, score: 0});
-                $("input[name=name]").val('');
-            }
-// return false so the page will not reload
-            return false;
+        'click #reset': function () {
+            Players.update(Session.get("selected_player"), {$set :{score: 0}});
         },
         'click #name': function () {
             var sort = Session.get("sort");
@@ -70,7 +49,7 @@ if (Meteor.isClient) {
                 var player = {name: players[i].name, score: Math.floor(Random.fraction()*10)*5};
                 Players.insert(player);
             }
-        },
+        }
     });
     /* When you click a player, select it */
     Template.player.events({
@@ -83,15 +62,11 @@ if (Meteor.isClient) {
 if (Meteor.isServer) {
     Meteor.startup(function () {
         if (Players.find().count() === 0) {
-            var names = ["Roger Zurawicki",
-                "Ada Lovelace",
-                "Grace Hopper",
-                "Marie Curie",
-                "Carl Friedrich Gauss",
-                "Nikola Tesla",
-                "Claude Shannon"];
+            var names = [
+                "Raphael Nadal",
+                ];
             for (var i = 0; i < names.length; i++)
-                Players.insert({name: names[i], score: Math.floor(Random.fraction()*10)*5});
+                Players.insert({name: names[i], score: 0});
         }
     });
 }
